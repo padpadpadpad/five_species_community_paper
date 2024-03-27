@@ -1,8 +1,8 @@
-# Repository for the analyses characterising the 5 species community
+# Repository for characterising the 5 species community
 
 ## Outline
 
-This is the repository for processed data and code of the paper: "Characterising a stable five-species microbial community for use in experimental evolution and ecology."
+This is the repository for processed data and code of the paper: "*Characterising a stable five-species microbial community for use in experimental evolution and ecology*". It mostly contains the processed datasets and code used to recreate the plots in the manuscript, as well as the raw Sanger sequencing data.
 
 ## Using this repository
 
@@ -10,5 +10,34 @@ The GitHub repo should be easy to use on everyone’s machine using RStudio proj
 
 ## Data
 
+A more detailed explanation of each data file is present in the script that uses it.
+
+-   **assignment_16s.csv** - cleaned output of 16s taxonomic assignment from the genome assemblies.
+
+-   **checkm.csv -** cleaned output of CheckM from the genome assemblies.
+
+-   **checkm2.csv -** cleaned output of CheckM from the genome assemblies.
+
+-   **gtdb_short.csv -** cleaned output of GTDBtk from the genome assemblies.
+
+-   **interaction_data.csv -** processed interaction data.
+
+-   **invasion_from_rare_data.csv -** processed invasion from rare data.
+
+-   **long_term_abundance_data.csv** - processed long term abundance data.
+
+-   **long_term_carrying_capacity.csv** - processed carrying capacity data.
+
+-   **supernatant_data.csv -** processed supernatant data.
+
+-   **long_term_assignment_16s.rds** - processed phyloseq object of the clone identification from long-term culturing of the 5 species community.
+
+-   **sanger/**\* - the raw files from the sanger sequencing of clones.
+
 ## Scripts
 
+-   **clone_id.R** - analyses **long_term_assignment_16s.rds** to look at how well the 5 species can be identified after \>1 year in co-culture.
+-   **make_genome_summary.R** - creates the genome summary table (Table 2) from **assignment_16s.csv**, **checkm.csv**, **checkm2.csv**, and **gtdb_short.csv**.
+-   **phenotypic_assays.R** - analyses the phenotypic data (supernatant assays, invasion-from-rare assays, medium-term persistence assays) and recreates Figures 2, 3, and 4.
+-   **sanger_sequence_clean_5spp.R -** sets trimming parameters for the raw sanger sequencing files in **sanger/**.
+-   **sanger_sequence_analysis_5spp.R -** trims the sanger sequencing files, assigns taxonomy using **dada2**, and recreates the table in Figure 1c.
