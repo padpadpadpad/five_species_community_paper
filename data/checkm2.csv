@@ -1,0 +1,6 @@
+"sample","completeness","contamination","completeness_model_used","translation_table_used","coding_density","N50_contig","average_gene_length","genome_size","GC","total_coding_sequences","additional_notes"
+"Achromobacter",100,0.98,"Neural Network (Specific Model)",11,0.909,6549044,331.659155399766,6549044,0.67,5991,"None"
+"Ochrobactrum",99.97,1.41,"Neural Network (Specific Model)",11,0.879,3759143,315.185405176071,5064753,0.57,4714,"None"
+"Pseudomonas",100,0.15,"Neural Network (Specific Model)",11,0.871,6759727,324.800429539072,6759727,0.6,6053,"None"
+"Stenotrophomonas",100,0.04,"Neural Network (Specific Model)",11,0.89,3694510,344.773936170213,3926254,0.66,3384,"None"
+"Variovorax",99.99,0.37,"Neural Network (Specific Model)",11,0.925,5748785,337.933620261546,6611336,0.68,6041,"None"

@@ -1,0 +1,10 @@
+"file","kingdom","phylum","class","order","family","genus","species","num_16s","dist_from_ref_16s"
+"Achromobacter","Bacteria","Proteobacteria","Gammaproteobacteria","Burkholderiales","Alcaligenaceae","Achromobacter",NA,4,0
+"Achromobacter","Bacteria","Proteobacteria","Gammaproteobacteria","Burkholderiales","Alcaligenaceae","Achromobacter",NA,4,0.00130975769482646
+"Achromobacter","Bacteria","Proteobacteria","Gammaproteobacteria","Burkholderiales","Alcaligenaceae",NA,NA,4,0.00392927308447937
+"Achromobacter","Bacteria","Proteobacteria","Gammaproteobacteria","Burkholderiales","Alcaligenaceae",NA,NA,4,0.00261951538965291
+"Ochrobactrum","Bacteria","Proteobacteria","Alphaproteobacteria","Rhizobiales","Rhizobiaceae","Ochrobactrum",NA,1,0
+"Pseudomonas","Bacteria","Proteobacteria","Gammaproteobacteria","Pseudomonadales","Pseudomonadaceae","Pseudomonas","fluorescens",2,0
+"Pseudomonas","Bacteria","Proteobacteria","Gammaproteobacteria","Pseudomonadales","Pseudomonadaceae","Pseudomonas",NA,2,0.000652741514360313
+"Stenotrophomonas","Bacteria","Proteobacteria","Gammaproteobacteria","Xanthomonadales","Xanthomonadaceae","Stenotrophomonas",NA,1,0
+"Variovorax","Bacteria","Proteobacteria","Gammaproteobacteria","Burkholderiales","Comamonadaceae","Variovorax","paradoxus",1,0

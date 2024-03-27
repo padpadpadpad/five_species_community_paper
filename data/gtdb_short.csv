@@ -1,0 +1,6 @@
+"sample","kingdom","phylum","class","order","family","genus","species","ref_accession","ani","align_frac","classification_method"
+"Achromobacter","Bacteria","Pseudomonadota","Gammaproteobacteria","Burkholderiales","Burkholderiaceae_C","Achromobacter","Achromobacter veterisilvae","GCF_900496975.1","98.86","0.934","ani_screen"
+"Ochrobactrum","Bacteria","Pseudomonadota","Alphaproteobacteria","Rhizobiales","Rhizobiaceae","Ochrobactrum_B","Ochrobactrum_B teleogrylli","GCF_006376685.1","98.22","0.907","ani_screen"
+"Pseudomonas","Bacteria","Pseudomonadota","Gammaproteobacteria","Pseudomonadales","Pseudomonadaceae","Pseudomonas_E","Pseudomonas_E fluorescens_BH","GCF_902498135.1","98.69","0.864","ani_screen"
+"Variovorax","Bacteria","Pseudomonadota","Gammaproteobacteria","Burkholderiales","Burkholderiaceae_B","Variovorax","Variovorax sp003019815","GCF_003019815.1","98.96","0.959","ani_screen"
+"Stenotrophomonas","Bacteria","Pseudomonadota","Gammaproteobacteria","Xanthomonadales","Xanthomonadaceae","Stenotrophomonas","Stenotrophomonas spp.","GCF_018612915.1","92.35","0.861","taxonomic classification defined by topology and ANI"
