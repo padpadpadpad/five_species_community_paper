@@ -4,6 +4,8 @@
 
 This is the repository for processed data and code of the paper: "*Characterising a stable five-species microbial community for use in experimental evolution and ecology*". It mostly contains the processed datasets and code used to recreate the plots in the manuscript, as well as the raw Sanger sequencing data.
 
+Please contact Daniel Padfield d.padfield\@exeter.ac.uk if you have any questions about any of the data or scripts in this analysis. Or raise an Issue on GitHub.
+
 ## Using this repository
 
 The GitHub repo should be easy to use on everyone’s machine using RStudio projects. RStudio projects automatically assigns the root directory to the directory in which the project resides. Consequently all of the analyses should be runnable without altering paths. Simply double-click on the .Rproj folder that is in the base folder of this repository and it should open the project in RStudio. All the packages used in the script should be at the top of each script, and RStudio usually requests you install them if they are not installed already.
@@ -35,6 +37,8 @@ A more detailed explanation of each data file is present in the script that uses
 -   **sanger/**\* - the raw files from the sanger sequencing of clones.
 
 -   **sanger/trimmed/\*** - the trimmed files from the sanger sequencing of clones.
+
+-   **sanger_seq_qualcheck.csv** - quality control stats for the sanger sequencing files.
 
 ## Scripts
 
