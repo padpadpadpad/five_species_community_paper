@@ -91,5 +91,7 @@ file.remove(list.files(fig_path, pattern = '.csv', full.names = TRUE))
 # get summary data for each file
 file_sum <- summarise.abi.folder('data/sanger')
 
+write.csv(file_sum$summaries, 'data/sanger_seq_qualcheck.csv')
+
 # do trimming and re-save files
 walk(files, trim_and_save, output_path = trimmed_path, trim_cutoff = 1e-04)

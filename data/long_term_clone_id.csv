@@ -1,0 +1,10 @@
+"isolate","genus","n","total"
+"Achromobacter","Achromobacter",34,34
+"Ochrobactrum","Achromobacter",2,34
+"Ochrobactrum","Ochrobactrum",32,34
+"Pseudomonas","Achromobacter",1,30
+"Pseudomonas","Pseudomonas",27,30
+"Pseudomonas","Variovorax",2,30
+"Stenotrophomonas","Stenotrophomonas",34,34
+"Variovorax","Pseudomonas",2,35
+"Variovorax","Variovorax",33,35

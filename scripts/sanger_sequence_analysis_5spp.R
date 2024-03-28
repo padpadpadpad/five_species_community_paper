@@ -1,9 +1,31 @@
-# sanger sequence analysis of 5 morphs
+# ---------------------------
+# Purpose of script: Analysing the sanger sequencing of the 5 species community morphs
+#
+# What this script does:
+# 1. aligns the sequences for each
+# 2. creates consensus sequence for each morph
+# 3. assigns taxonomy to each consensus sequence using dada2
+#
+# Author: Dr. Daniel Padfield
+#
+# Date Created: 2024-03-28
+#
+# Copyright (c) Daniel Padfield, 2024
+#
+# ---------------------------
+#
+# Notes: The dada2 database used may result in slightly different results based on the version of the database used.
+#
+# ---------------------------
 
+# if librarian is not installed, install it
+if (!requireNamespace("librarian", quietly = TRUE)){
+  install.packages("librarian")
+}
 # load packages
-librarian::shelf(sangeranalyseR, Biostrings, ShortRead, msa, tidyverse, stringr, dada2, ggtree, patchwork, extrafont, flextable, officer)
+librarian::shelf(sangeranalyseR, Biostrings, ShortRead, msa, dada2, ggtree, patchwork, tidyverse, flextable, officer)
 
-loadfonts()
+## ---------------------------
 
 #---------------------#
 # Custom functions ####
@@ -30,7 +52,7 @@ clean_base_pairs <- function(sequence, to_contain = "CATG"){
 #------------------------------------------#
 
 # load in cleaned sanger sequence data
-trimmed_files <- list.files('sequencing/sanger_final/trimmed/', full.names = TRUE, pattern = '.txt')
+trimmed_files <- list.files('data/sanger/trimmed', full.names = TRUE, pattern = '.txt')
 
 # filter out files for morphs used in the 5 species community. This was community 18.
 # B - gamma
@@ -38,11 +60,6 @@ trimmed_files <- list.files('sequencing/sanger_final/trimmed/', full.names = TRU
 # D - epsilon
 # E - zeta
 # F - kappa
-
-# to keep
-files_to_keep <- c('_g_', '_d_', '_e_', '_z_', '_k_')
-
-trimmed_files <- stringr::str_subset(trimmed_files, paste(files_to_keep, collapse = '|'))
 
 # bind all files together
 d_trim <- map_df(trimmed_files, read_and_bind) %>%
@@ -57,7 +74,7 @@ d_trim <- filter(d_trim, seq_len >= 100)
 # 4 have dropped out
 
 # filter out files that have > 5 secondary peaks or an average quality below 30
-to_trim <- read_csv('sequencing/sanger_final/sanger_seq_qualcheck.csv') %>% 
+to_trim <- read_csv('data/sanger_seq_qualcheck.csv') %>% 
   filter(trimmed.secondary.peaks > 5 | trimmed.mean.quality < 30) %>%
   pull(file.name) %>%
   tools::file_path_sans_ext()
@@ -70,7 +87,9 @@ d_trim <- mutate(d_trim, file = gsub('-', '_', file)) %>%
   separate(., file, c('week', 'microcosm', 'morph', 'blah1'), sep = '_', remove = FALSE) %>%
   select(-contains('blah'))
 
+#-----------------------------------#
 # align sequences for each morph ####
+#-----------------------------------#
 
 # how many morphs
 unique(d_trim$morph)
@@ -96,6 +115,7 @@ p_b <- ggtree(b_dist) %<+% d_labs +
   geom_tiplab(aes(label=label2), size = MicrobioUoE::pts(9), hjust = -0.1) +
   geom_tippoint(size = 3) +
   labs(title = '(a) morph B')
+# all one sequence
 
 # consensus sequence for c - delta
 d_trim_c <- filter(d_trim, morph == 'd') 
@@ -116,6 +136,7 @@ p_c <- ggtree(c_dist) %<+% d_labs +
   geom_tiplab(aes(label=label2), size = MicrobioUoE::pts(9), hjust = -0.1) +
   geom_tippoint(size = 3) +
   labs(title = '(c) morph C')
+# all one sequence
 
 # consensus sequence for d - epsilon
 d_trim_d <- filter(d_trim, morph == 'e') 
@@ -138,6 +159,7 @@ p_d <- ggtree(d_dist) %<+% d_labs +
   geom_tippoint(size = 3) +
   labs(title = '(d) morph D') +
   scale_x_continuous(expand = c(.1, .1))
+# 3 consensus sequences
 
 # need 3 DNA sequences for d
 d_trim_d1 <- filter(d_trim_d, file %in% c('3_15_e_515F.txt', '3_39_e_515F.txt', '3_27_e_515F.txt', '6_18_e_515F.txt')) 
@@ -178,6 +200,7 @@ p_e <- ggtree(e_dist) %<+% d_labs +
   geom_tippoint(size = 3) +
   labs(title = '(e) morph E') +
   scale_x_continuous(expand = c(.1, .1))
+# one consensus sequence
 
 # consensus sequence for f - kappa
 d_trim_f <- filter(d_trim, morph == 'k') 
@@ -200,6 +223,7 @@ p_f <- ggtree(f_dist) %<+% d_labs +
   geom_tippoint(size = 3) +
   labs(title = '(f) morph F') +
   scale_x_continuous(expand = c(.1, .1))
+# 2 consensus sequences
 
 # need 2 DNA sequences for f
 d_trim_f1 <- filter(d_trim_f, file != '6_9_k_515F.txt') 
@@ -213,7 +237,10 @@ f_consensus2 <- msaConsensusSequence(f_align)
 
 f_consensus <- c(f_consensus1, f_consensus2)
 
-# combine all the consensus sequences together
+#-------------------------------------------------#
+# combine all the consensus sequences together ####
+#-------------------------------------------------#
+
 names <- paste(c('b', 'c', 'd', 'e', 'f'), 'consensus', sep = '_')
 all_consensus <- mget(names) %>% unlist(., use.names = FALSE)
 morph <- c('b', 'c', 'd', 'd', 'd', 'e', 'f', 'f')
@@ -238,23 +265,11 @@ tree <- msa(all_SS, method = 'ClustalW') %>%
 d_labs <- tibble(label = tree$tip.label) %>%
   mutate(., label2 = paste('morph ', toupper(substr(label,1,1)),'\nconsensus seq ', substr(label,2,2), sep = ''))
 
-p_all <- ggtree(tree) %<+% d_labs + 
-  geom_tiplab(aes(label=label2), size = MicrobioUoE::pts(12), hjust = -0.1) +
-  geom_tippoint(size = 3) +
-  scale_x_continuous(expand = c(.1, .1))
+#--------------------------------#
+# assign taxonomy using dada2 ####
+#--------------------------------#
 
-ggsave('manu_figs/consensus_seq_tree.pdf', p_all, height = 9, width =7)
-ggsave('manu_figs/consensus_seq_tree.png', p_all, height = 9, width =7)
-
-# save these files out into fasta files
-list_consensus <- mutate(all_consensus, file = paste('sequencing/sanger_final/consensus_seqs/consensus_', morph, '.fasta', sep = ''),
-                         row = 1:n()) %>%
-  nest(-row) %>%
-  pull(data)
-
-walk(.x = list_consensus, .f = ~seqinr::write.fasta(.x$seq, names = .x$morph, nbchar = 1000, file.out = .x$file, as.string=TRUE))
-
-# assign taxonomy of consensus sequences using dada2
+# grab the longest bit of sequence without an N in
 all_consensus_taxa <- all_consensus %>%
   nest(seq) %>%
   mutate(seq_no_n = map(data, clean_base_pairs)) %>%
@@ -262,14 +277,14 @@ all_consensus_taxa <- all_consensus %>%
   mutate(., length_no_ns = nchar(seq_no_n),
          length_seq = nchar(seq))
 
-taxa <- dada2::assignSpecies(all_consensus_taxa$seq_no_n, 'sequencing/dada2_databases/rdp_species_assignment_16.fa.gz') %>%
+download.file('https://zenodo.org/records/801828/files/rdp_train_set_16.fa.gz?download=1', 'data/rdp_train_set_16.fa.gz')
+
+# assign taxonomy
+taxa <- dada2::assignTaxonomy(all_consensus_taxa$seq, 'data/rdp_train_set_16.fa.gz', minBoot = 40) %>%
   data.frame(row.names = NULL, stringsAsFactors = FALSE) %>%
   bind_cols(., all_consensus)
 
-taxa2 <- dada2::assignTaxonomy(all_consensus_taxa$seq, 'sequencing/dada2_databases/rdp_train_set_16.fa.gz', minBoot = 40) %>%
-  data.frame(row.names = NULL, stringsAsFactors = FALSE) %>%
-  bind_cols(., all_consensus)
-
+# create labels for tree plot
 d_labs <- tibble(label = tree$tip.label) %>%
   mutate(., morph2 = case_when(substr(label,1,1) == 'b' ~ 'c',
                               substr(label,1,1) == 'd' ~ 'a',
@@ -279,13 +294,12 @@ d_labs <- tibble(label = tree$tip.label) %>%
   mutate(num_seqs = c('9/9 sequences', '1/8 sequences', '6/6 sequences', '3/8 sequences', '10/11 sequences', '1/11 sequences', '4/8 sequences', '9/9 sequences'),
          prop = c(9/9, 1/8, 6/6, 3/8, 10/11,1/11,4/8,9/9)) %>%
   mutate(., label2 = paste('morph ', morph2,'\n', num_seqs, sep = '')) %>%
-  full_join(., select(taxa2, genus = Genus, label = morph)) %>%
-  full_join(., select(taxa, species = Species, label = morph)) %>%
-  mutate(species = ifelse(is.na(species), 'spp', species),
-         label3 = paste(genus, 'spp', sep = ' '))
+  full_join(., select(taxa, genus = Genus, label = morph)) %>%
+  mutate(label3 = paste(genus, 'spp', sep = ' '))
 
 head(d_labs)
 
+# plot tree
 p_all <- ggtree(tree) %<+% d_labs + 
   geom_tiplab(aes(label=label2), size = MicrobioUoE::pts(12), offset = 0.01, family = 'Helvetica') +
   geom_tiplab(aes(label=paste0('italic(', genus,')~sp.')), 
@@ -294,8 +308,7 @@ p_all <- ggtree(tree) %<+% d_labs +
   scale_x_continuous(expand = c(.10, .1)) +
   theme(legend.position = 'none')
 
-ggsave('manu_figs/invasion_vs_density/consensus_seq_tree.pdf', p_all, height = 6, width =7)
-ggsave('manu_figs/invasion_vs_density/consensus_seq_tree.png', p_all, height = 6, width =7)
+ggsave('plots/consensus_seq_tree.png', p_all, height = 6, width =7)
 
 # make summary table, not consensus sequence tree
 head(d_labs)
@@ -310,23 +323,7 @@ d_table <- select(d_labs, morph2, num_seqs, prop, genus) %>%
   select(-morph2) %>%
   arrange(isolate, -prop)
 
-table <- select(d_table, isolate, genus, num_seqs) %>%
-  flextable() %>%
-  set_header_labels(isolate = 'Isolate',
-                    genus = 'Sanger sequence assignment',
-                    num_seqs = 'Number of clones assigned\n from disassembled communities') %>%
-  align(align = 'center', part = 'all') %>% # align column names centrally
-  align(align = 'left', part = 'body', j =2) %>% 
-  font(fontname = 'Times', part = 'all') %>% # set font name for the table
-  fontsize(size = 12, part = 'all') %>% # set font size for the table
-  hline(i = c(3,5,6,7), border = fp_border_default()) %>%
-  compose(j = "genus",
-          value = as_paragraph(as_i(genus), ' sp.')
-  ) %>% 
-  bold(part = 'body', j = 2, i = c(1,4,6,7,8)) %>% # bold the column names
-  autofit() # fix any random size issues
-
-# make alternative table
+# make table
 d_table <- group_by(d_table, isolate) %>%
   mutate(genus2 = ifelse(prop < max(prop), 'Other', genus),
          num_seqs = parse_number(num_seqs),
@@ -340,7 +337,7 @@ d_table <- group_by(d_table, isolate) %>%
 
 # load in long-term stability summary data
 # change isolate column to 1-5 based on alphabet of genus
-d_long <- read.csv('data/processed/clone_id.csv') %>%
+d_long <- read.csv('data/long_term_clone_id.csv') %>%
   mutate(isolate = case_when(isolate == 'Achromobacter' ~ 1,
                              isolate == 'Ochrobactrum' ~ 2,
                              isolate == 'Pseudomonas' ~ 3,
@@ -368,7 +365,7 @@ table <- full_join(d_table, d_long) %>%
   font(fontname = 'Times', part = 'all') %>% # set font name for the table
   fontsize(size = 12, part = 'all') %>% # set font size for the table
   hline(i = c(2,4,6,7), border = fp_border_default()) %>%
-  compose(j = "genus2",
+  compose(j = 2,
           i = c(1,3,5,7,8),
           value = as_paragraph(as_i(genus2), ' sp.')
   ) %>% 
@@ -376,5 +373,5 @@ table <- full_join(d_table, d_long) %>%
   autofit() # fix any random size issues
 
 # save this table
-save_as_image(table, 'figures/new/colony_table.png')
+save_as_image(table, 'plots/colony_table.png')
  
