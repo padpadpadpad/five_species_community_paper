@@ -34,6 +34,8 @@ A more detailed explanation of each data file is present in the script that uses
 
 -   **sanger/**\* - the raw files from the sanger sequencing of clones.
 
+-   **sanger/trimmed/\*** - the trimmed files from the sanger sequencing of clones.
+
 ## Scripts
 
 -   **sanger_sequence_clean_5spp.R -** sets trimming parameters for the raw sanger sequencing files in **sanger/**.
