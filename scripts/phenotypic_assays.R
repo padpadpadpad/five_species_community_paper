@@ -43,15 +43,24 @@ d_supernatant <- read.csv('data/supernatant_data.csv')
 d_interaction <- read.csv('data/interaction_data.csv')
 # focal_spp: species being measured
 # other_spp: species it was grown in combination with
-# rel_fit: 
-# tot_hoi:
-# expected_fitness_tot:
+# rel_fit: measured relative fitness of focal species compared to growth in monoculture
+# tot_hoi: total indirect interaction (observed - expected)
+# expected_fitness_tot: expected relative fitness from pairwise interactions
 
 # load in invasion from rare data
 d_invasion <- read.csv('data/invasion_from_rare_data.csv')
+# focal_spp: species being measured
+# other_spp: species it was grown in combination with
+# inv_fit: relative invader fitness
+# inv_count: final abundance of invader (CFUs/mL)
 
 # load in long term abundance data
 d_abundance <- read.csv('data/long_term_abundance_data.csv')
+# focal_spp: species being measured
+# n_spp: number of species cultured together
+# other_spp: species it was grown in combination with
+# prop_mean: proportion of focal species in community combination
+# long_term_abundance: final abundance of focal species in that community combination (CFUs/mL)
 
 # combine datasets
 d <- left_join(d_supernatant, d_interaction) %>%

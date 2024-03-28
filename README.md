@@ -26,9 +26,9 @@ A more detailed explanation of each data file is present in the script that uses
 
 -   **long_term_abundance_data.csv** - processed long term abundance data.
 
--   **long_term_carrying_capacity.csv** - processed carrying capacity data.
-
 -   **supernatant_data.csv -** processed supernatant data.
+
+-   **invasion_from_rare_raw.csv** **-** raw invasion from rare data.
 
 -   **long_term_assignment_16s.rds** - processed phyloseq object of the clone identification from long-term culturing of the 5 species community.
 
@@ -38,6 +38,7 @@ A more detailed explanation of each data file is present in the script that uses
 
 -   **sanger_sequence_clean_5spp.R -** sets trimming parameters for the raw sanger sequencing files in **sanger/**.
 -   **sanger_sequence_analysis_5spp.R -** trims the sanger sequencing files, assigns taxonomy using **dada2**, and recreates the table in Figure 1c.
--   **phenotypic_assays.R** - analyses the phenotypic data (supernatant assays, invasion-from-rare assays, medium-term persistence assays) and recreates Figures 2, 3, and 4.
+-   **invasion_from_rare.R** - analysis of invasion from rare data and recreates Figure 2.
+-   **phenotypic_assays.R** - analyses the phenotypic data (supernatant assays, invasion-from-rare assays, medium-term persistence assays) and recreates Figures 3, and 4.
 -   **long_term_clone_id.R** - analyses **long_term_assignment_16s.rds** to look at how well the 5 species can be identified after \>1 year in co-culture.
 -   **make_genome_summary.R** - creates the genome summary table (Table 1) from **assignment_16s.csv**, **checkm.csv**, **checkm2.csv**, and **gtdb_short.csv**.
