@@ -1,32 +1,57 @@
-#---------------------------#
-# fresh analyses of data ####
-#---------------------------#
+# ---------------------------
+# Purpose of script: Phenotypic analysis of five species community data
+#
+# What this script does:
+# 1. Reads in data from processed data files
+# 2. Checks whether the invasion from rate assays over one week reached carrying capacity
+# 3. Looks at pairwise interactions between species (Figure 3)
+# 4. Looks at indirect interactions of multi-species combinations (Figure 4)
+#
+# Author: Dr. Daniel Padfield
+#
+# Date Created: 2024-03-27
+#
+# Copyright (c) Daniel Padfield, 2024
+#
+# ---------------------------
+#
+# Notes: None
+#
+# ---------------------------
 
-# ideas to look at
+# if librarian is not installed, install it
+if (!requireNamespace("librarian", quietly = TRUE)){
+  install.packages("librarian")
+}
+# load packages
+librarian::shelf(patchwork, smatr, cowplot, MuMIn, padpadpadpad/MicrobioUoE, palettetown, tidyverse)
 
-# re whether growth rate predicts long-term abundance
+## ---------------------------
 
-#---------------------#
-# load in packages ####
-#---------------------#
-
-librarian::shelf(tidyverse, patchwork, smatr, cowplot, MuMIn, padpadpadpad/MicrobioUoE, palettetown)
-
-#---------------------#
 # load in datasets ####
-#---------------------#
+# throughout species are labelled a, o, p, s, v, the first letter of their genus name
 
 # load in supernatant data
-d_supernatant <- read.csv('data/processed/supernatant_data.csv')
+d_supernatant <- read.csv('data/supernatant_data.csv')
+# focal_spp: species being measured
+# other_spp: species of supernatant focal species is grown in
+# intra_effect: estimate of intraspecific effect (when focal species is grown in supernatant of itself)
+# inter_effect: estimate of interspecific effect (when focal species is grown in supernatant of other_spp)
+# fresh_gr_rate: growth rate of focal species in fresh media
 
 # load in interaction data
-d_interaction <- read.csv('data/processed/interaction_data.csv')
+d_interaction <- read.csv('data/interaction_data.csv')
+# focal_spp: species being measured
+# other_spp: species it was grown in combination with
+# rel_fit: 
+# tot_hoi:
+# expected_fitness_tot:
 
 # load in invasion from rare data
-d_invasion <- read.csv('data/processed/invasion_from_rare_data.csv')
+d_invasion <- read.csv('data/invasion_from_rare_data.csv')
 
 # load in long term abundance data
-d_abundance <- read.csv('data/processed/long_term_abundance_data.csv')
+d_abundance <- read.csv('data/long_term_abundance_data.csv')
 
 # combine datasets
 d <- left_join(d_supernatant, d_interaction) %>%
@@ -34,27 +59,26 @@ d <- left_join(d_supernatant, d_interaction) %>%
   left_join(., d_abundance) %>%
   mutate(diversity = nchar(other_spp) + 1)
 
-# load in carrying capacity dataset
-d_carrying_capacity <- read.csv('data/processed/long_term_carrying_capacity.csv')
-
-#-------------------------------------------#
-# look at some interesting relationships ####
-#-------------------------------------------#
-
 # make colour scheme
 color_scheme <- c(a = '#e41a1c', o = '#377eb8', p = '#4daf4a', s = '#984ea3', v = '#ff7f00')
+
+# set labels to be used in plots
 labs <- c(expression(italic("Achromobacter")~sp.), expression(italic("Ochrobactrum")~sp.), expression(italic("Pseudomonas")~sp.), expression(italic("Stenotrophomonas")~sp.), expression(italic("Variovorax")~sp.))
 labs2 <- c(expression(italic("Achromobacter")~sp.), expression(italic("Ochrobactrum")~sp.), expression(italic("Pseudomonas")~sp.), expression(italic("Stenotrophomonas")~sp.), expression(italic("Variovorax")~sp.))
 
 # check whether our short-term invasion assays are just measuring long-term abundance ####
+
+# calculate proportion as invader count / its long term abundance
 d_abundance_check <- mutate(d, prop = inv_count/long_term_abundance)
 
+# make histogram
 p1 <- ggplot(d_abundance_check, aes(prop)) +
   geom_vline(aes(xintercept = 1)) +
   geom_histogram(col = 'black', fill = 'grey', bins = 15) +
   theme_bw(base_size = 10) +
   labs(x = 'invasion N/equilibrium N')
 
+# make plot of long term abundance against invader count
 p2 <- ggplot(d_abundance_check, aes(long_term_abundance, inv_count)) +
   geom_abline(aes(slope = 1, intercept = 0), linetype = 2) +
   stat_smooth(method = 'lm', se = FALSE, col = 'black') +
@@ -71,28 +95,37 @@ p2 <- ggplot(d_abundance_check, aes(long_term_abundance, inv_count)) +
   scale_fill_manual('Focal species:', values = color_scheme, labels = labs) +
   theme(legend.text.align = 0)
 
+# inset p1 into p2
 p3 <- ggdraw(p2) +
   draw_plot(p1, .1, .58, .37, .37)
 
 p3
 
-# so invader final abundance is lower than equilibrium abundance in all instances
+# so invader final abundance is lower than equilibrium abundance in almost instances
 d_abundance_check %>% filter(long_term_abundance < inv_count) 
 # one instance where invasion abundance > long term abundance
+
 d_abundance_check %>% filter(inv_count/long_term_abundance > 0.8) 
 # two more where this is > 0.8
 # so our measure of relative invader fitness is not just an estimate of carrying capacity. GOOD!
 
+#----------------------------------#
+# look at pairwise interactions ####
+#----------------------------------#
+
+# measured this in two ways: coculture and supernatant
+
+# calculate mean relative fitness of each species in coculture
 d_coculture_sum <- filter(d, diversity == 2) %>%
   group_by(., diversity, focal_spp) %>%
   summarise(se = sd(rel_fit)/sqrt(n()),
             ave_relfit = mean(rel_fit), 
             .groups = 'drop')
 
-# make plot of pairwise interactions
+# make plot of pairwise interactions from coculture
 p_coculture <- ggplot(filter(d, diversity == 2)) +
   geom_hline(aes(yintercept = 1), linetype = 2) +
-  geom_linerange(aes(focal_spp, ymin = ave_relfit - se, ymax = ave_relfit + se), data = d_coculture_sum) +
+  geom_linerange(aes(focal_spp, ymin = ave_relfit - 1.96*se, ymax = ave_relfit + 1.96*se), data = d_coculture_sum) +
   geom_point(aes(focal_spp, ave_relfit, col = focal_spp), size = 5, d_coculture_sum) +
   geom_point(aes(focal_spp, rel_fit, fill = focal_spp), shape = 21, col = 'white', show.legend = FALSE) +
   theme_bw(base_size = 12) +
@@ -106,7 +139,7 @@ p_coculture <- ggplot(filter(d, diversity == 2)) +
   ylim(c(0, 1.6)) +
   scale_x_discrete(labels = labs2, guide = guide_axis(n.dodge = 2))
 
-# plot of pairwise interactions from the supernatant
+
 d_super_sum <- filter(d_supernatant, nchar(other_spp) == 1) %>%
   group_by(focal_spp) %>%
   summarise(., se = sd(inter_effect)/sqrt(n()),
@@ -119,7 +152,7 @@ d_super_sum <- mutate(d_super_sum, lower_conf = inter_effect - 1.96*se,
                       reduction_lower = (1 - lower_conf) *100,
                       intra_lower = reduction_intra / reduction_lower)
 
-
+# plot of pairwise interactions from the supernatant
 p_supernatant <- ggplot(filter(d_supernatant, nchar(other_spp) == 1), aes(x = focal_spp, y = inter_effect)) +
   geom_hline(aes(yintercept = 1), linetype = 2) +
   geom_linerange(aes(ymin = inter_effect - 1.96 *se, ymax = inter_effect + 1.96*se), data = d_super_sum) +
@@ -137,10 +170,7 @@ p_supernatant <- ggplot(filter(d_supernatant, nchar(other_spp) == 1), aes(x = fo
   ylim(c(0, 1.6)) +
   scale_x_discrete(labels = labs2, guide = guide_axis(n.dodge = 2))
 
-p_supernatant + p_coculture + plot_layout(guides = 'collect')
-
-ggsave('figures/new/supernatant.png', p_supernatant, width = 7, height = 4)
-
+# look at relationship between supernatant estimate and coculture estimate 
 fit_sma <- smatr::sma(rel_fit ~ inter_effect, filter(d, n_spp == 2), slope.test = 1, robust = TRUE)
 preds <- data.frame(expand.grid(inter_effect = seq(min(filter(d, n_spp == 2)$inter_effect, na.rm = T), max(filter(d, n_spp == 2)$inter_effect, na.rm = T), length.out = 40), stringsAsFactors = FALSE)) %>%
   mutate(., preds = coef(fit_sma)[1] + coef(fit_sma)[2]*inter_effect)
@@ -166,6 +196,7 @@ d <- mutate(d, type_supernatant = ifelse(inter_effect < 1, 'negative', 'positive
             type_long_term = ifelse(rel_fit < 1, 'negative', 'positive'),
             short_same_as_long = ifelse(type_supernatant == type_long_term, 'yes', 'no')) 
 
+# manually check a couple
 filter(d, diversity == 2) %>%
   select(focal_spp, other_spp, rel_fit, inter_effect, short_same_as_long) %>%
   View()
@@ -180,16 +211,18 @@ p2 <- ggplot(filter(d, n_spp == 2), aes(short_same_as_long)) +
   theme_classic(base_size = 8) +
   labs(y = 'number',
        x = 'Same interaction\nsign')
+
 # inset plot
 p3 <- p_coculture_supernatant + inset_element(p2, left = 0.05, bottom = 0.65, right = 0.35, top = 0.95)
 
+# collate plot into Figure 3
 p_supernatant + p_coculture + p3 + plot_layout(guides = 'collect')
 
-ggsave('figures/new/interactions.png', last_plot(), height =4, width = 13)
+ggsave('plots/figure_3.png', last_plot(), height =4, width = 13)
 
-#--------------------------------------#
-# look at higher order interactions ####
-#--------------------------------------#
+#----------------------------------#
+# look at indirect interactions ####
+#----------------------------------#
 
 # filter for only when there are more than two species
 # classify indirect interaction as either synergistic or buffering
@@ -200,6 +233,7 @@ d_many_species <- filter(d, diversity > 2) %>%
                                   expected_fitness_tot > 1 & tot_hoi > 0 ~ 'synergistic'))
 
 # scale indirect interactions that are currently just the sum of observed - expected
+# basically make sure that synergistic and buffering indirect interactions have the right sign
 d_many_species <- 
   mutate(d_many_species, 
          tot_hoi2 = case_when(expected_fitness_tot <= 1 & tot_hoi <= 0 ~ tot_hoi*-1,
@@ -207,6 +241,7 @@ d_many_species <-
                               expected_fitness_tot > 1 & tot_hoi <= 0 ~ tot_hoi,
                               expected_fitness_tot > 1 & tot_hoi > 0 ~ tot_hoi))
 
+# manual check
 select(d_many_species, expected_fitness_tot, rel_fit, tot_hoi, tot_hoi2, hoi_class) %>%
   View()
 
@@ -271,12 +306,12 @@ p_hoi2
 
 p_hoi + p_hoi2
 
-ggsave('figures/new/interactions_ii.png', last_plot(), height =4.5, width = 10)
+ggsave('plots/figure_4.png', last_plot(), height =4.5, width = 10)
 
+# run simple model of this
 mod1 <- lm(expected_fitness_tot ~ hoi_class, filter(d_many_species, expected_interaction == 'negative'))
 mod2 <- lm(expected_fitness_tot ~ 1 ,filter(d_many_species, expected_interaction == 'negative'))
 anova(mod1, mod2)
-mod2 <- lm(expected_fitness_tot ~ 1, filter(d_many_species,  expected_fitness_tot <=1))
 
 # have a look at number of buffering and synergisms
 group_by(d_many_species, hoi_class, diversity) %>%
@@ -286,51 +321,3 @@ group_by(d_many_species, hoi_class, diversity) %>%
   mutate(prop = n/sum(n)) %>%
   ungroup() %>%
   arrange(diversity)
-
-lm(abs(tot_hoi) ~ hoi_class, d_many_species) %>%
-  summary()
-
-
-# plot expected fitness across hoi class
-p_hoi4 <- ggplot(filter(d_many_species, expected_fitness_tot > 1), aes(hoi_class, expected_fitness_tot, col = hoi_class, fill = hoi_class)) +
-  MicrobioUoE::geom_pretty_boxplot() +
-  geom_point(position = position_jitter(width = 0.2), shape = 21, fill = 'white') +
-  theme_bw() +
-  labs(x = 'Interaction type',
-       y = 'Expected fitness from pairwise coculture') +
-  scale_color_poke(pokemon = 'blastoise')
-
-p_hoi4
-
-# proportion of synergism / buffering
-
-ggplot(d_many_species, aes(expected_fitness_tot, tot_hoi, col = hoi_class)) +
-  geom_point() +
-  geom_hline(aes(yintercept = 0), linetype = 2) +
-  labs(x = 'expected fitness',
-       y = 'Total higher order interaction') +
-  theme_bw(base_size = 12) +
-  theme(legend.text.align = 0) +
-  facet_wrap(~diversity)
-
-# plot total expected fitness change and then the number of buffering and synergistic interactions
-d_many_species <- mutate(d_many_species, absolute_prediction = abs(1 - expected_fitness_tot))
-
-ggplot(filter(d_many_species, expected_fitness_tot <=1), aes(hoi_class, expected_fitness_tot)) +
-  geom_boxplot() +
-  labs(x = 'Higher order interaction class',
-       y = 'Expected fitness') +
-  theme_bw(base_size = 12) +
-  theme(legend.text.align = 0) +
-  facet_wrap(~diversity)
-
-mod1 <- lm(expected_fitness_tot ~ hoi_class, filter(d_many_species,  expected_fitness_tot <=1))
-mod2 <- lm(expected_fitness_tot ~ 1, filter(d_many_species,  expected_fitness_tot <=1))
-mod3 <- lm(expected_fitness_tot ~ hoi_class, filter(d_many_species, expected_fitness_tot <=1 & diversity == 3))
-mod4 <- lm(expected_fitness_tot ~ 1, filter(d_many_species, expected_fitness_tot <=1 & diversity == 3))
-mod5 <- lm(expected_fitness_tot ~ hoi_class, filter(d_many_species, expected_fitness_tot <=1 & diversity == 4))
-mod6 <- lm(expected_fitness_tot ~ 1, filter(d_many_species, expected_fitness_tot <=1 & diversity == 4))
-
-anova(mod1, mod2)
-anova(mod3, mod4)
-anova(mod5, mod6)
