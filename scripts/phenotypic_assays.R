@@ -225,9 +225,9 @@ p2 <- ggplot(filter(d, n_spp == 2), aes(short_same_as_long)) +
 p3 <- p_coculture_supernatant + inset_element(p2, left = 0.05, bottom = 0.65, right = 0.35, top = 0.95)
 
 # collate plot into Figure 3
-p_supernatant + p_coculture + p3 + plot_layout(guides = 'collect')
+p_supernatant + p_coculture + p3 + guide_area() + plot_layout(guides = 'collect', nrow = 2)
 
-ggsave('plots/figure_3.png', last_plot(), height =4, width = 13)
+ggsave('plots/figure_3.png', last_plot(), height =8, width = 9)
 
 #----------------------------------#
 # look at indirect interactions ####

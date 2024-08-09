@@ -129,8 +129,9 @@ aa_plot <- filter(d_grobs, inv_sp == 'AA') %>%
       .$subgrobs +
       geom_point(aes(x1, rel_fit), filter(d, inv_sp == 'AA'), size = 0.5) +
       coord_flip() +
-      theme_bw(base_size = 14) +
-      theme(panel.grid.minor.y = element_blank()) +
+      theme_bw(base_size = 16) +
+      theme(panel.grid.minor.y = element_blank(),
+            axis.title.x = element_blank()) +
       labs(title = expression('(a)'~italic('Achromobacter')~sp.),
            x = 'resident community diversity',
            y = 'relative invader growth rate') + 
@@ -149,8 +150,9 @@ od_plot <- filter(d_grobs, inv_sp == 'OD') %>%
       .$subgrobs +
       geom_point(aes(x1, rel_fit), filter(d, inv_sp == 'OD'), size = 0.5) +
       coord_flip() +
-      theme_bw(base_size = 14) +
-      theme(panel.grid.minor.y = element_blank()) +
+      theme_bw(base_size = 16) +
+      theme(panel.grid.minor.y = element_blank(),
+            axis.title.x = element_blank()) +
       labs(title = expression('(b)'~italic('Ochrobactrum')~sp.),
            x = 'resident community diversity',
            y = 'relative invader growth rate') + 
@@ -169,8 +171,9 @@ pc_plot <- filter(d_grobs, inv_sp == 'PC') %>%
       .$subgrobs +
       geom_point(aes(x1, rel_fit), filter(d, inv_sp == 'PC'), size = 0.5) +
       coord_flip() +
-      theme_bw(base_size = 14) +
-      theme(panel.grid.minor.y = element_blank()) +
+      theme_bw(base_size = 16) +
+      theme(panel.grid.minor.y = element_blank(),
+            axis.title.x = element_blank()) +
       labs(title = expression('(c)'~italic('Pseudomonas')~sp.),
            x = 'resident community diversity',
            y = 'relative invader growth rate') + 
@@ -189,7 +192,7 @@ sr_plot <- filter(d_grobs, inv_sp == 'SR') %>%
       .$subgrobs +
       geom_point(aes(x1, rel_fit), filter(d, inv_sp == 'SR'), size = 0.5) +
       coord_flip() +
-      theme_bw(base_size = 14) +
+      theme_bw(base_size = 16) +
       theme(panel.grid.minor.y = element_blank()) +
       labs(title = expression('(d)'~italic('Stenotrophomonas')~sp.),
            x = 'resident community diversity',
@@ -209,7 +212,7 @@ vg_plot <- filter(d_grobs, inv_sp == 'VG') %>%
       .$subgrobs +
       geom_point(aes(x1, rel_fit), filter(d, inv_sp == 'VG'), size = 0.5) +
       coord_flip() +
-      theme_bw(base_size = 14) +
+      theme_bw(base_size = 16) +
       theme(panel.grid.minor.y = element_blank()) +
       labs(title = expression('(e)'~italic('Variovorax')~sp.),
            x = 'resident community diversity',
@@ -226,6 +229,7 @@ plot_leg <- ggplot(d, aes(x1, rel_fit, col = inv_sp)) +
 plot_leg <- get_legend(plot_leg)
 
 # combine plots
-p <- plot_grid(aa_plot, od_plot, pc_plot, sr_plot, vg_plot, plot_leg, ncol = 3)
+p <- plot_grid(aa_plot, od_plot, pc_plot, sr_plot, vg_plot, plot_leg, ncol = 2, align = 'hv', axis = 'b')
 
-ggsave('plots/figure_2.png', p, width = 12, height = 9)
+ggsave('plots/figure_2.png', p, width = 10, height = 13)
+

@@ -80,3 +80,4 @@ table1
 
 # save out table
 save_as_image(table1, 'plots/table_1.png', webshot = 'webshot2')
+save_as_docx(table1, path = 'plots/table_1.docx')
