@@ -229,7 +229,7 @@ plot_leg <- ggplot(d, aes(x1, rel_fit, col = inv_sp)) +
 plot_leg <- get_legend(plot_leg)
 
 # combine plots
-p <- plot_grid(aa_plot, od_plot, pc_plot, sr_plot, vg_plot, plot_leg, ncol = 2, align = 'hv', axis = 'b')
+p <- plot_grid(aa_plot, od_plot, pc_plot, sr_plot, vg_plot, plot_leg, ncol = 3, align = 'hv', axis = 'b')
 
-ggsave('plots/figure_2.png', p, width = 10, height = 13)
+ggsave('plots/figure_2.png', p, width = 13, height = 8, bg = 'white')
 
