@@ -1,0 +1,1 @@
+/Users/dp415/google_drive/work_googledrive/five_species_community/five_spp_genomes/assemblies/Pseudomonas.fasta	/Users/dp415/google_drive/work_googledrive/five_species_community/coexisting_community_paper/github/data/genome_comparison/genbank/bacteria/GCA_931907645.1/GCA_931907645.1_MPBAS00001_genomic.fna.gz	83.6321	1217	2253
