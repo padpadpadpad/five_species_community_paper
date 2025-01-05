@@ -45,6 +45,7 @@ d_checkm <- read.csv('data/checkm.csv')
 d_taxa <- left_join(d_gtdbtk, d_16s) %>%
   left_join(., d_checkm2) %>%
   left_join(., select(d_checkm, sample, n_contigs)) %>%
+  arrange(sample) %>%
   # add in column for ncbi strain names
   mutate(community_member = 1:n(),
          species2 = c('Achromobacter veterisilvae', 'Ochrobactrum teleogrylli', 'Pseudomonas fluorescens', 'Stenotrophomonas', 'Variovorax'),
